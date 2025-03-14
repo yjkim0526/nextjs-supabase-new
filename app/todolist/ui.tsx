@@ -12,7 +12,7 @@ export default function TodoPage() {
   const [todoInput, setTodoInput] = useState("");
 
   const todosQuery = useQuery({
-    queryKey: ["todo", searchInput],
+    queryKey: ["todos", searchInput],
     queryFn: () => getTodos({ searchInput }),
   });
 
