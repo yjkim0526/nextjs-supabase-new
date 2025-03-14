@@ -17,7 +17,7 @@ export async function getTodos({ searchInput = "" }): Promise<TodoRow[]> {
   const { data, error } = await supabase
     .from("todo")
     .select("*")
-    .like("todo", `%${searchInput}%`)
+    .like("title", `%${searchInput}%`)
     .order("created_at", { ascending: true });
 
   if (error) {

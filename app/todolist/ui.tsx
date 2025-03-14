@@ -12,13 +12,13 @@ export default function TodoPage() {
   const [todoInput, setTodoInput] = useState("");
 
   const todosQuery = useQuery({
-    queryKey: ["todos", searchInput],
+    queryKey: ["todo", searchInput],
     queryFn: () => getTodos({ searchInput }),
   });
 
-  // useEffect(() => {
-  //   todosQuery.refetch();
-  // }, [searchInput]);
+  useEffect(() => {
+    todosQuery.refetch();
+  }, [searchInput]);
 
   const createTodoMutation = useMutation({
     mutationFn: () => createTodo({ title: todoInput, completed: false }),
@@ -73,6 +73,7 @@ export default function TodoPage() {
       </div>
       <div className="container mb-20">
         {todosQuery.isPending && <p>Loding ... </p>}
+        {/* {todosQuery.data && JSON.stringify(todosQuery.data)} */}
         {todosQuery.data &&
           todosQuery.data.map((todo) => <Todo key={todo.id} todo={todo} />)}
       </div>
