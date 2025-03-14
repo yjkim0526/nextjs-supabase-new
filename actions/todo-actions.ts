@@ -14,12 +14,11 @@ function handleError(error) {
 
 export async function getTodos({ searchInput = "" }): Promise<TodoRow[]> {
   const supabase = await createServerSupabaseClient();
-
   const { data, error } = await supabase
     .from("todo")
     .select("*")
-    .like("title", `%${searchInput}%`)
-    .order("created_at", { ascending: false });
+    .like("todo", `%${searchInput}%`)
+    .order("created_at", { ascending: true });
 
   if (error) {
     handleError(error);
@@ -49,13 +48,15 @@ export async function updateTodo(todo: TodoRowUpdate) {
   const supabase = await createServerSupabaseClient();
   console.log(todo);
 
+  const { id } = await todo;
+
   const { data, error } = await supabase
     .from("todo")
     .update({
       ...todo,
-      updated_at: new Date().toISOString(),
+      //updated_at: new Date().toISOString(),
     })
-    .eq("id", todo.id);
+    .eq("id", id);
 
   if (error) {
     handleError(error);
