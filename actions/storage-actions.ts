@@ -17,7 +17,7 @@ export async function uploadeFile(formData: FormData) {
 
   const { data, error } = await supabase.storage
     .from(process.env.NEXT_PUBLIC_STORAGE_BUCKET as string)
-    // .upload(file.name, file, { upsert: false });
+    // .upload(file.name, file, { upsert: true });
     .upload(saveFileName, file, { upsert: false });
 
   handleError(error);

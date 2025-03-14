@@ -48,15 +48,13 @@ export async function updateTodo(todo: TodoRowUpdate) {
   const supabase = await createServerSupabaseClient();
   console.log(todo);
 
-  const { id } = await todo;
-
   const { data, error } = await supabase
     .from("todo")
     .update({
       ...todo,
       //updated_at: new Date().toISOString(),
     })
-    .eq("id", id);
+    .eq("id", todo.id);
 
   if (error) {
     handleError(error);
