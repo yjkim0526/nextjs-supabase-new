@@ -1,179 +1,94 @@
 "use client";
 
-import { useReducer, useState } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
+import Header from "components/todo_reduce/Header";
+import TodoList from "components/todo_reduce/TodoList";
+import InputTodo from "components/todo_reduce/InputTodo";
+import "./ui.css";
 
-const stylebtn = "border border-grey-700 px-2 py-1 rounded bg-black text-white";
-const styleInput = "border border-grey-700 p-1 rounded ";
-
-function AddTask({ onAddTask }) {
-  const [text, setText] = useState("");
-  return (
-    <>
-      <input
-        className={styleInput}
-        placeholder="Add todo"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-      />
-      <button
-        className={stylebtn}
-        onClick={() => {
-          setText("");
-          onAddTask(text);
-        }}
-      >
-        Add
-      </button>
-    </>
-  );
-}
-
-function TaskList({ tasks, onChangeTask, onDeleteTask }) {
-  return (
-    <ul>
-      {tasks.map((task) => (
-        <li key={task.id}>
-          <Task task={task} onChange={onChangeTask} onDelete={onDeleteTask} />
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-function Task({ task, onChange, onDelete }) {
-  const [isEditing, setIsEditing] = useState(false);
-  let taskContent;
-  if (isEditing) {
-    taskContent = (
-      <>
-        <input
-          className="w-[80%]"
-          value={task.text}
-          onChange={(e) => {
-            onChange({
-              ...task,
-              text: e.target.value,
-            });
-          }}
-        />
-        <div className="flex justify-center gap-2 w-36">
-          <button className={stylebtn} onClick={() => setIsEditing(false)}>
-            저장
-          </button>
-          <button className={stylebtn} onClick={() => onDelete(task.id)}>
-            삭제
-          </button>
-        </div>
-      </>
-    );
-  } else {
-    taskContent = (
-      <>
-        <span className="w-[80%]"> {task.text}</span>
-        <div className="flex justify-center gap-2 w-36">
-          <button className={stylebtn} onClick={() => setIsEditing(true)}>
-            수정
-          </button>
-          <button className={stylebtn} onClick={() => onDelete(task.id)}>
-            삭제
-          </button>
-        </div>
-      </>
-    );
+function reducer(state, action) {
+  console.log("Reducer ... :", state, action);
+  switch (action.type) {
+    case "INIT_TODO":
+      return action.data;
+    case "CREATE_TODO":
+      state = [action.data, ...state];
+      localStorage.setItem("todos", JSON.stringify(state));
+      return state;
+    case "UPDATE_TODO":
+      state = state.map((todo) =>
+        todo.id === action.targetId
+          ? { ...todo, completed: !todo.completed }
+          : todo
+      );
+      localStorage.setItem("todos", JSON.stringify(state));
+      return state;
+    case "DELETE_TODO":
+      state = state.filter((todo) => todo.id !== action.targetId);
+      localStorage.setItem("todos", JSON.stringify(state));
+      return state;
+    default:
+      return state;
   }
-  return (
-    <div className="flex gap-2 ">
-      <input
-        className="w-4"
-        type="checkbox"
-        checked={task.done}
-        onChange={(e) => {
-          onChange({
-            ...task,
-            done: e.target.checked,
-          });
-        }}
-      />
-      {taskContent}
-    </div>
-  );
 }
 
 export default function TaskApp() {
-  const [tasks, dispatch] = useReducer(tasksReducer, initialTasks);
+  const [initData, setInitData] = useState([]);
+  const [todos, dispatch] = useReducer(reducer, initData);
+  const idRef = useRef(0);
 
-  function handleAddTask(text) {
-    dispatch({
-      type: "added",
-      id: nextId++,
-      text: text,
-    });
-  }
-
-  function handleChangeTask(task) {
-    dispatch({
-      type: "changed",
-      task: task,
-    });
-  }
-
-  function handleDeleteTask(taskId) {
-    dispatch({
-      type: "deleted",
-      id: taskId,
-    });
-  }
-
-  return (
-    <>
-      <div className="flex flex-col gap-4 pl-10 lg:w-[50%] md:w-[80%] w-[90%]">
-        <h1 className="text-2xl font-bold">Todo ( Reducer )</h1>
-        <AddTask onAddTask={handleAddTask} />
-        <TaskList
-          tasks={tasks}
-          onChangeTask={handleChangeTask}
-          onDeleteTask={handleDeleteTask}
-        />
-      </div>
-    </>
-  );
-}
-
-function tasksReducer(tasks, action) {
-  switch (action.type) {
-    case "added": {
-      return [
-        ...tasks,
-        {
-          id: action.id,
-          text: action.text,
-          done: false,
-        },
-      ];
-    }
-    case "changed": {
-      return tasks.map((t) => {
-        if (t.id === action.task.id) {
-          return action.task;
-        } else {
-          return t;
-        }
+  useEffect(() => {
+    if (localStorage.getItem("todos") !== null) {
+      console.log("length: " + localStorage.getItem("todos").length);
+      idRef.current = localStorage.getItem("todos").length;
+      console.log(">> localStorage data exists");
+      const localTodos = JSON.parse(localStorage.getItem("todos"));
+      setInitData(localTodos);
+      dispatch({
+        type: "INIT_TODO",
+        data: localTodos,
       });
     }
-    case "deleted": {
-      return tasks.filter((t) => t.id !== action.id);
-    }
-    default: {
-      throw Error("Unknown action: " + action.type);
-    }
-  }
-}
+  }, []);
 
-let nextId = 3;
-const initialTasks = [
-  { id: 0, text: "Todo 1 text ", done: true },
-  { id: 1, text: "Todo 2 text ", done: false },
-  { id: 2, text: "Todo 3 text ", done: false },
-  { id: 3, text: "Todo 4 text ", done: true },
-  { id: 4, text: "Todo 5 text ", done: false },
-];
+  const onCreateTodo = (content) => {
+    dispatch({
+      type: "CREATE_TODO",
+      data: {
+        completed: false,
+        created_at: new Date().getTime(),
+        id: todos.length + 1, // idRef.current++,
+        title: content,
+      },
+    });
+  };
+
+  const onUpdateTodo = (todoId) => {
+    console.log(">>> todoId : ", todoId);
+    dispatch({
+      type: "UPDATE_TODO",
+      targetId: todoId,
+    });
+  };
+
+  const onDeleteTodo = (todoId) => {
+    console.log(">>> todoId : ", todoId);
+    dispatch({
+      type: "DELETE_TODO",
+      targetId: todoId,
+    });
+  };
+
+  return (
+    <div className="App">
+      <Header />
+      <InputTodo onCreateTodo={onCreateTodo} />
+      <TodoList
+        todos={todos}
+        onUpdateTodo={onUpdateTodo}
+        onDeleteTodo={onDeleteTodo}
+      />
+      {/* {JSON.stringify(initData)} */}
+    </div>
+  );
+}

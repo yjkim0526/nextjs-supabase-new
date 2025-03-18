@@ -32,7 +32,7 @@ export default function TodoPage() {
   };
 
   return (
-    <div className="w-2/3 mx-auto flex flex-col items-center py-10 gap-2">
+    <div className="w-1/3 mx-auto flex flex-col items-center py-10 gap-2">
       <div className="w-full flex gap-10 justify-center">
         <h1 className="text-xl mt-2">TODO LIST</h1>
         {/* <Input
@@ -47,7 +47,7 @@ export default function TodoPage() {
       </div>
 
       <div className="mt-14 flex items-center justify-between gap-4  w-full mb-10">
-        <div className="relative w-full ml-2">
+        <div className="relative w-full ml-2 flex-1">
           <input
             type="text"
             value={todoInput}
@@ -56,7 +56,7 @@ export default function TodoPage() {
             className="w-full border border-gray-500 rounded p-2 "
           />
         </div>
-        <div className="w-40">
+        <div className="">
           <Button
             onClick={() => createTodoMutation.mutate()}
             loading={createTodoMutation.isPending}
@@ -65,7 +65,7 @@ export default function TodoPage() {
               <p>등록중</p>
             ) : (
               <p>
-                <i className="fas fa-plus"></i> ADD TODO
+                <i className="fas fa-plus"></i> 추가
               </p>
             )}
           </Button>

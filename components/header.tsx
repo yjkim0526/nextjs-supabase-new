@@ -11,6 +11,7 @@ export default function Header() {
         <div className="flex gap-4 mr-10">
           <Link href="/">Home</Link>
           <Link href="/todolist">Todo</Link>
+          <Link href="/todolist2">Todo2</Link>
           <Link href="/dropbox">Dropbox</Link>
         </div>
       </div>
