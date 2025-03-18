@@ -20,7 +20,7 @@ function TodoList({ todos, onUpdateTodo, onDeleteTodo }) {
   const filteredTodos = getFilteredData();
 
   return (
-    <div className="flex flex-col gap-4 justify-center">
+    <div className="flex flex-col gap-2 justify-center">
       <h4 className="text-xl mt-8 font-bold">Todo List</h4>
       <input
         className="flex-1 border-b-2 border-b-blue-500 mb-5"

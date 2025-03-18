@@ -13,15 +13,14 @@ export async function uploadeFile(formData: FormData) {
   const supabase = await createServerSupabaseClient();
 
   const file = formData.get("file") as File;
-  const saveFileName = Date.now() + "-" + file.name.toString();
-
+  const saveFileName = Date.now() + "-" + file.lastModified.toString();
+  // console.log(">> saveFileName", saveFileName);
   const { data, error } = await supabase.storage
     .from(process.env.NEXT_PUBLIC_STORAGE_BUCKET as string)
-    // .upload(file.name, file, { upsert: true });
     .upload(saveFileName, file, { upsert: false });
 
   handleError(error);
-  console.log("uploadeFile : ", data);
+  // console.log("uploadeFile : ", data);
   return data;
 }
 
@@ -32,7 +31,6 @@ export async function searchFiles(search: string = "") {
     .list("", { search });
 
   handleError(error);
-
   return data;
 }
 
