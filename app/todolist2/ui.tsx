@@ -7,43 +7,42 @@ import InputTodo from "components/todo_reduce/InputTodo";
 import "./ui.css";
 
 function reducer(state, action) {
-  console.log("Reducer ... :", state, action);
+  // console.log("Reducer ... :", state, action);
+  let nextState;
   switch (action.type) {
     case "INIT_TODO":
       return action.data;
-    case "CREATE_TODO":
-      state = [action.data, ...state];
-      localStorage.setItem("todos", JSON.stringify(state));
-      return state;
-    case "UPDATE_TODO":
-      state = state.map((todo) =>
+    case "CREATE_TODO": {
+      nextState = [action.data, ...state];
+      break;
+    }
+    case "UPDATE_TODO": {
+      nextState = state.map((todo) =>
         todo.id === action.targetId
           ? { ...todo, completed: !todo.completed }
           : todo
       );
-      localStorage.setItem("todos", JSON.stringify(state));
-      return state;
-    case "DELETE_TODO":
-      state = state.filter((todo) => todo.id !== action.targetId);
-      localStorage.setItem("todos", JSON.stringify(state));
-      return state;
+      break;
+    }
+    case "DELETE_TODO": {
+      nextState = state.filter((todo) => todo.id !== action.targetId);
+      break;
+    }
     default:
       return state;
   }
+  localStorage.setItem("todos", JSON.stringify(nextState));
+  return nextState;
 }
 
 export default function TaskApp() {
-  const [initData, setInitData] = useState([]);
-  const [todos, dispatch] = useReducer(reducer, initData);
+  const [todos, dispatch] = useReducer(reducer, []);
   const idRef = useRef(0);
 
   useEffect(() => {
     if (localStorage.getItem("todos") !== null) {
-      console.log("length: " + localStorage.getItem("todos").length);
-      idRef.current = localStorage.getItem("todos").length;
-      console.log(">> localStorage data exists");
       const localTodos = JSON.parse(localStorage.getItem("todos"));
-      setInitData(localTodos);
+      idRef.current = localTodos.length + 1;
       dispatch({
         type: "INIT_TODO",
         data: localTodos,
